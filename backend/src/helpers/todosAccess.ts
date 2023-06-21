@@ -1,9 +1,10 @@
 import * as AWS from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
-import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import { DocumentClient, Key } from 'aws-sdk/clients/dynamodb'
 // import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
+import { Page } from '../models/Page';
 
 const XAWS = AWSXRay.captureAWSClient(new AWS.DynamoDB())
 // const logger = createLogger('todosAccess');
@@ -32,6 +33,26 @@ export class TodosAccess {
     const items = result.Items;
 
     return items as TodoItem[];
+  }
+
+  async getTodosWithPagination(userId: string, limit: number, startKey: Key): Promise<Page> {
+    const result = await this.docClient.query({
+      TableName: this.todosTable,
+      Limit: limit,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: {
+        ':userId': userId
+      },
+      ExclusiveStartKey: startKey,
+      ScanIndexForward: false
+    }).promise();
+
+    const page: Page = {
+      items: result.Items as TodoItem[],
+      nextKey: result.LastEvaluatedKey
+    }
+
+    return page;
   }
 
   async createTodo(todoItem: TodoItem): Promise<TodoItem> {

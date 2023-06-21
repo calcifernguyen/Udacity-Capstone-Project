@@ -8,6 +8,8 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
 import { TodoUpdate } from '../models/TodoUpdate';
+import { PaginationRequest } from '../requests/PaginationRequest';
+import { Page } from '../models/Page';
 
 // TODO: Implement businessLogic
 const todosAccess = new TodosAccess();
@@ -18,6 +20,12 @@ export async function getTodosForUser(userId: string): Promise<TodoItem[]> {
   logger.info(`Get todos for userId = ${userId}`);
   const todos = await todosAccess.getTodos(userId);
   return todos;
+}
+
+export async function getTodosForUsersWithPagination(userId: string, paginationRequest: PaginationRequest): Promise<Page> {
+  logger.info(`Get todos for userId = ${userId} with pagination`);
+  const page: Page = await todosAccess.getTodosWithPagination(userId, paginationRequest.limit, paginationRequest.startKey);
+  return page;
 }
 
 export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest): Promise<TodoItem> {
