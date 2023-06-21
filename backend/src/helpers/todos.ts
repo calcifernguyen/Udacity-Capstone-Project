@@ -7,6 +7,7 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
+import { TodoUpdate } from '../models/TodoUpdate';
 
 // TODO: Implement businessLogic
 const todosAccess = new TodosAccess();
@@ -24,7 +25,7 @@ export async function updateTodo(userId: string, todoId: string, updateTodoReque
   
   await checkTodoExist(userId, todoId);
 
-  const updatedTodo = await todosAccess.updateTodo(userId, todoId, updateTodoRequest);
+  const updatedTodo = await todosAccess.updateTodo(userId, todoId, updateTodoRequest as TodoUpdate);
   return updatedTodo;
 }
 

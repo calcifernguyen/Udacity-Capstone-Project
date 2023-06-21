@@ -32,14 +32,28 @@ provider:
     # Enable API Gateway logs
     restApi: true
 
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - xray:PutTelemetryRecords
-            - xray:PutTraceSegments
-          Resource: "*"
+  # iam:
+  #   role:
+  #     statements:
+  #       - Effect: Allow
+  #         Action:
+  #           - xray:PutTelemetryRecords
+  #           - xray:PutTraceSegments
+  #         Resource: "*"
+
+# custom:
+#   documentation:
+#     api:
+#       version: v1.0.0
+#       title: Todo App Api
+#       description: Serverless todo application
+#     models:
+#       - name: CreateTodo
+#         contentType: application/json
+#         schema: ${file(models/create-todo-model.json)}
+#       - name: UpdateTodo
+#         contentType: application/json
+#         schema: ${file(models/update-todo-model.json)}
 
 functions:
 
@@ -56,10 +70,12 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-    iamRoleStatementsInherit: true
+    # iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
           - dynamodb:Query
         Resource: 
           - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}'
@@ -76,14 +92,23 @@ functions:
           method: post
           path: todos
           cors: true
+          # reqValidatorName: RequestBodyValidator
+          # documentation:
+          #   summary: Create a new todo
+          #   description: Create a new todo
+          #   requestModels:
+          #     'application/json': CreateTodo
           authorizer: Auth
+          reqValidatorName: RequestBodyValidator
           request:
             schemas:
               application/json: ${file(models/create-todo-model.json)}
-    iamRoleStatementsInherit: true
+    # iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
           - dynamodb:PutItem
         Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}'
       # - Effect: 'Allow'
@@ -102,15 +127,23 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
+          # reqValidatorName: RequestBodyValidator
+          # documentation:
+          #   summary: Update a todo
+          #   description: Update a todo
+          #   requestModels:
+          #     'application/json': UpdateTodo
           authorizer: Auth
           reqValidatorName: RequestBodyValidator
           request:
             schemas:
               application/json: ${file(models/update-todo-model.json)}
-    iamRoleStatementsInherit: true
+    # iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
           - dynamodb:UpdateItem
           - dynamodb:GetItem
         Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}'
@@ -131,10 +164,12 @@ functions:
           path: todos/{todoId}
           cors: true
           authorizer: Auth
-    iamRoleStatementsInherit: true
+    # iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
           - dynamodb:GetItem
           - dynamodb:DeleteItem
         Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}'
@@ -155,15 +190,19 @@ functions:
           path: todos/{todoId}/attachment
           cors: true
           authorizer: Auth
-    iamRoleStatementsInherit: true
+    # iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: 'Allow'
         Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
           - s3:PutObject
           - s3:GetObject
         Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*'
       - Effect: Allow
         Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
           - dynamodb:UpdateItem
           - dynamodb:GetItem
         Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}'
